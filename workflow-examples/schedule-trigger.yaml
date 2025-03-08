@@ -1,0 +1,13 @@
+trigger: none
+schedules:  
+  - cron: "* * * * *"
+    branches:
+      include:
+        - main
+jobs:
+  - job: scheduleedJob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - script: echo "hello from scheduled job"
+        displayName: 'runon schedule'
