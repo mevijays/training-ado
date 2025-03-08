@@ -1,0 +1,15 @@
+name: 'this is named pipeline'
+trigger: none
+pr: 
+  - main
+pool:
+  name: 'azure-pool'
+stages:
+  - stage: PrintHelloWorld
+    jobs:
+    - job: printmessage
+      steps:
+      - script: echo "Hello World"
+        displayName: 'Print hello world'
+      - script: echo "i am second step in pipeline job"
+        displayName: 'second step'
