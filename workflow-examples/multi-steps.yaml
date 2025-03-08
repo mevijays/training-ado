@@ -1,0 +1,18 @@
+trigger: none
+pool:
+  vmImage: 'ubuntu-latest'
+stages:
+  - stage: buildanddeploy
+    jobs:
+      - job: buildndeploy
+        steps:
+         - script: echo "Hello step1"
+           displayName: ' step1 execution'
+         - script: echo "Hello step2"
+           displayName: ' step2 execution'
+         - script: echo "Hello step3"
+           displayName: ' step3 execution'
+         - script: echo "Hello step4"
+           displayName: ' step4 execution'
+         - script: echo "Hello step5"
+           displayName: ' step5 execution'
