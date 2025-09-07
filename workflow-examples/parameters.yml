@@ -1,0 +1,34 @@
+trigger: none
+parameters:
+- name: buildType
+  displayName: 'Build type'
+  type: string
+  default: 'Debug'
+  values:
+    - Debug
+    - Release
+
+- name: runTests
+  displayName: 'Run unit tests'
+  type: boolean
+  default: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    echo "Build type chosen is ${{ parameters.buildType }}"
+    echo "Run tests: ${{ parameters.runTests }}"
+  displayName: 'Show parameters'
+
+- script: |
+    echo "Building project as ${{ parameters.buildType }} configuration"
+    # Your build command here
+  displayName: 'Build step'
+
+- ${{ if eq(parameters.runTests, true) }}:
+  - script: |
+      echo "Executing unit tests..."
+      # Your test command here
+    displayName: 'Unit test step if enabled'
