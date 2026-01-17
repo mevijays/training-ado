@@ -76,7 +76,7 @@ If you prefer to control the `settings.xml` manually (e.g., if you are using a c
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
 ```
-**NOTE: use either of one method. mavenauthenticatetask or settings.xml**
+**NOTE: use either of one method. mavenauthenticatetask or settings.xml. If using maven authenticate then no -s settings.xml**
 ---
 
 ### Comparison of Methods
