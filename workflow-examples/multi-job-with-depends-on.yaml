@@ -1,0 +1,43 @@
+trigger: none
+
+stages:
+  - stage: buildanddeploy
+    jobs:
+      - job: joba
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+         - script: echo "Hello joba"
+           displayName: ' step1 execution'
+      - job: jobb
+        dependsOn: joba
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+         - script: echo "Hello jobb"
+           displayName: ' step1 execution'
+      - job: jobc
+        dependsOn: joba
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+         - script: echo "Hello jobc"
+           displayName: ' step1 execution'
+      - job: jobd
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: 
+          - joba
+          - jobb
+        steps:
+         - script: echo "Hello jobd"
+           displayName: ' step1 execution'
+      - job: jobf
+        dependsOn: jobb
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+         - script: echo "Hello jobe"
+           displayName: ' step1 execution'
+         - script: echo "Hello jobe step2"
+           displayName: ' step2 execution'

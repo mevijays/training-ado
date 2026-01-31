@@ -1,0 +1,182 @@
+# Name for your pipeline (optional)
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+# --- TRIGGERS ---
+# Define when the pipeline should run.
+# You can have multiple trigger types (CI, PR, scheduled).
+
+# Continuous Integration (CI) trigger: Runs on pushes to specified branches.
+trigger:
+  batch: true # Set to true to batch multiple commits into a single run
+  branches:
+    include:
+      - main # Triggers on pushes to the main branch
+      - develop
+      - feature/* # Triggers on pushes to any branch starting with 'feature/'
+    exclude:
+      - hotfix/old-feature # Excludes pushes to this specific branch
+  paths:
+    include:
+      - 'src/*' # Only trigger if files in the 'src' folder change
+    exclude:
+      - 'docs/*' # Don't trigger for changes in the 'docs' folder
+      - '*.md' # Don't trigger for changes to Markdown files
+
+# Pull Request (PR) trigger: Runs when a pull request is opened or updated, targeting specified branches.
+pr:
+  autoCancel: true # Automatically cancel in-progress runs for the same PR when new commits are pushed
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - 'src/*'
+    exclude:
+      - 'tests/performance/*'
+  drafts: false # Set to true if you want to trigger builds for draft PRs
+
+# Scheduled trigger: Runs the pipeline on a schedule.
+schedules:
+  - cron: "0 0 * * 0" # Run every Sunday at midnight UTC
+    displayName: Weekly Sunday midnight build
+    branches:
+      include:
+        - main
+    always: true # Set to true to run even if there are no code changes since the last successful scheduled run
+
+# --- VARIABLES ---
+# Define variables that can be used throughout the pipeline.
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  vmImageName: 'windows-latest' # Default VM image for jobs
+  # You can also link to variable groups from Azure DevOps Library
+  # - group: YourVariableGroupName
+
+# --- AGENT POOL ---
+# Define the default agent pool for all jobs in this pipeline.
+# This can be overridden at the job or stage level.
+pool:
+  vmImage: $(vmImageName) # Uses a Microsoft-hosted agent. Common images: 'ubuntu-latest', 'windows-latest', 'macOS-latest'
+  # To use a self-hosted agent pool:
+  # name: 'YourSelfHostedPoolName'
+  # demands:
+  #   - specificCapability # Ensure the agent has this capability
+  #   - Agent.OS -equals Windows_NT # Example demand for a Windows agent
+
+# --- STAGES ---
+# Pipelines can be organized into stages. Each stage can have its own jobs, pool, and conditions.
+stages:
+- stage: Build
+  displayName: Build Stage
+  jobs:
+  - job: BuildJob
+    displayName: Build and Package
+    pool: # Pool for this specific job (overrides pipeline-level pool if specified)
+      vmImage: 'ubuntu-latest'
+      # name: 'SpecificBuildPool'
+    steps:
+    # --- TASKS ---
+    # Define the sequence of tasks to be executed.
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
+
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet packages'
+      inputs:
+        restoreSolution: '$(solution)'
+
+    - task: VSBuild@1
+      displayName: 'Build solution'
+      inputs:
+        solution: '$(solution)'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT')) # Run this task only on Windows agents and if previous tasks succeeded
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build .NET Core project'
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj' # Path to your project file(s)
+        arguments: '--configuration $(buildConfiguration)'
+      condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT')) # Example: Run for non-Windows agents
+
+    - task: CopyFiles@2
+      displayName: 'Copy Files to Artifact Staging Directory'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/MyWebApp/bin/$(BuildConfiguration)'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      condition: succeeded() # Run if previous tasks succeeded
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container' # Or 'FilePath' for a file share
+      condition: succeeded()
+
+- stage: Test
+  displayName: Test Stage
+  dependsOn: Build # This stage depends on the successful completion of the 'Build' stage
+  condition: succeeded('Build') # Run this stage only if the 'Build' stage succeeded
+  jobs:
+  - job: TestJob
+    displayName: Run Unit Tests
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: VSTest@2
+      displayName: 'Run Unit Tests with VSTest'
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        codeCoverageEnabled: true
+      condition: succeeded()
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFormat: 'VSTest' # Or 'JUnit', 'NUnit', 'XUnit', 'CTest'
+        testResultsFiles: '**/TEST-*.xml' # Pattern to find test result files
+        mergeTestResults: true
+      condition: succeededOrFailed() # Publish results even if some tests failed
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish Code Coverage'
+      inputs:
+        codeCoverageTool: ' cobertura' # Or 'JaCoCo'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml' # Adjust path and format
+      condition: succeededOrFailed()
+
+# You can add more stages for deployment, etc.
+# - stage: DeployToDev
+#   displayName: Deploy to Development
+#   dependsOn: Test
+#   condition: succeeded('Test')
+#   jobs:
+#   - deployment: DeployWebAppDev # Special job type for deployments
+#     displayName: Deploy Web App to Dev
+#     environment: 'DevelopmentEnvironment.WebAppResource' # Define your environment in Azure DevOps
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: AzureWebApp@1
+#             displayName: 'Deploy Azure Web App'
+#             inputs:
+#               azureSubscription: '<Your Azure Subscription Service Connection>'
+#               appName: '<Your Web App Name>'
+#               package: '$(Pipeline.Workspace)/drop/**/*.zip' # Assuming 'drop' artifact from Build stage

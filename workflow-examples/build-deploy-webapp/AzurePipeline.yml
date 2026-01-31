@@ -1,0 +1,26 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Az-connect'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      echo " Logging into acr"
+      az acr login -n mevijay
+      docker build -t mevijay.azurecr.io/hello-java:$(Build.BuildId) . -f stagedockerbuild.dockerfile 
+      docker push mevijay.azurecr.io/hello-java:$(Build.BuildId)
+- task: AzureRmWebAppDeployment@5
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Az-connect'
+    appType: 'webAppContainer'
+    WebAppName: 'krlabweb'
+    DockerNamespace: 'mevijay.azurecr.io'
+    DockerRepository: 'hello-java'
+    DockerImageTag: '$(Build.BuildId)'
+    AppSettings: '-Port 8080'

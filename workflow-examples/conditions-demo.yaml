@@ -1,0 +1,242 @@
+# Azure DevOps Pipeline Conditions Demo
+# Shows all common condition patterns with simple echo scripts
+
+trigger:
+- none
+
+# ============================================
+# PARAMETERS - Different Types
+# ============================================
+parameters:
+  # Boolean parameter
+  - name: runTests
+    displayName: 'Run Tests'
+    type: boolean
+    default: true
+
+  # Boolean parameter
+  - name: deployProd
+    displayName: 'Deploy to Production'
+    type: boolean
+    default: false
+
+  # String parameter with allowed values
+  - name: environment
+    displayName: 'Environment'
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - uat
+      - prod
+
+  # String parameter (free text)
+  - name: version
+    displayName: 'Version Tag'
+    type: string
+    default: 'latest'
+
+pool:
+  vmImage: ubuntu-latest
+
+# ============================================
+# STAGES WITH CONDITIONS
+# ============================================
+stages:
+
+# ------------------------------------------
+# STAGE 1: Build (Always runs)
+# ------------------------------------------
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - script: echo "Building the application..."
+      displayName: 'Build Step'
+
+    # CONDITION: Boolean parameter is TRUE
+    - script: echo "Running tests because runTests=true"
+      displayName: 'Run Tests (if enabled)'
+      condition: eq('${{ parameters.runTests }}', true)
+
+    # CONDITION: Boolean parameter is FALSE
+    - script: echo "Tests are skipped because runTests=false"
+      displayName: 'Skip Tests Message'
+      condition: eq('${{ parameters.runTests }}', false)
+
+# ------------------------------------------
+# STAGE 2: Deploy Dev (String parameter check)
+# ------------------------------------------
+- stage: DeployDev
+  dependsOn: Build
+  # CONDITION: String equals specific value
+  condition: eq('${{ parameters.environment }}', 'dev')
+  jobs:
+  - job: DeployDevJob
+    steps:
+    - script: echo "Deploying to DEV environment"
+      displayName: 'Deploy to Dev'
+
+# ------------------------------------------
+# STAGE 3: Deploy UAT (String parameter check)
+# ------------------------------------------
+- stage: DeployUAT
+  dependsOn: Build
+  # CONDITION: String equals specific value
+  condition: eq('${{ parameters.environment }}', 'uat')
+  jobs:
+  - job: DeployUATJob
+    steps:
+    - script: echo "Deploying to UAT environment"
+      displayName: 'Deploy to UAT'
+
+# ------------------------------------------
+# STAGE 4: Deploy Prod (Multiple conditions with AND)
+# ------------------------------------------
+- stage: DeployProd
+  dependsOn: Build
+  # CONDITION: AND - Both conditions must be true
+  condition: and(eq('${{ parameters.environment }}', 'prod'), eq('${{ parameters.deployProd }}', true))
+  jobs:
+  - job: DeployProdJob
+    steps:
+    - script: echo "Deploying to PROD environment"
+      displayName: 'Deploy to Prod'
+
+# ------------------------------------------
+# STAGE 5: Notifications (OR condition)
+# ------------------------------------------
+- stage: Notify
+  dependsOn:
+    - DeployDev
+    - DeployUAT
+    - DeployProd
+  # CONDITION: OR - Run if ANY of these stages succeeded
+  condition: or(succeeded('DeployDev'), succeeded('DeployUAT'), succeeded('DeployProd'))
+  jobs:
+  - job: NotifyJob
+    steps:
+    - script: echo "Sending deployment notification..."
+      displayName: 'Send Notification'
+
+# ------------------------------------------
+# STAGE 6: Job to Job Dependencies
+# ------------------------------------------
+- stage: MultiJobStage
+  dependsOn: Build
+  condition: always()  # CONDITION: Always run regardless of previous stage status
+  jobs:
+
+  # Job A - First job
+  - job: JobA
+    steps:
+    - script: echo "Job A running..."
+      displayName: 'Job A'
+    - script: echo "Job A setting output variable"
+      displayName: 'Set Output'
+      name: setvar
+      # Note: In real use, you'd set a variable here
+
+  # Job B - Depends on Job A success
+  - job: JobB
+    dependsOn: JobA
+    # CONDITION: Previous job succeeded
+    condition: succeeded('JobA')
+    steps:
+    - script: echo "Job B running after Job A succeeded"
+      displayName: 'Job B (depends on A)'
+
+  # Job C - Depends on Job A failure
+  - job: JobC
+    dependsOn: JobA
+    # CONDITION: Previous job failed
+    condition: failed('JobA')
+    steps:
+    - script: echo "Job C running because Job A failed"
+      displayName: 'Job C (failure handler)'
+
+  # Job D - Always runs after Job A (success or fail)
+  - job: JobD
+    dependsOn: JobA
+    # CONDITION: Always run after dependency
+    condition: always()
+    steps:
+    - script: echo "Job D always runs after Job A"
+      displayName: 'Job D (always)'
+
+  # Job E - Runs only if Job A was skipped
+  - job: JobE
+    dependsOn: JobA
+    # CONDITION: Dependency was skipped
+    condition: eq(dependencies.JobA.result, 'Skipped')
+    steps:
+    - script: echo "Job E runs because Job A was skipped"
+      displayName: 'Job E (skipped handler)'
+
+# ------------------------------------------
+# STAGE 7: Variable-based Conditions
+# ------------------------------------------
+- stage: VariableConditions
+  dependsOn: Build
+  variables:
+    isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+    isPR: $[eq(variables['Build.Reason'], 'PullRequest')]
+  jobs:
+  - job: VariableJob
+    steps:
+    # CONDITION: Built-in variable check
+    - script: echo "This is the main branch"
+      displayName: 'Main Branch Only'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+
+    # CONDITION: Check if PR build
+    - script: echo "This is a Pull Request build"
+      displayName: 'PR Build Only'
+      condition: eq(variables['Build.Reason'], 'PullRequest')
+
+    # CONDITION: NOT - Negation
+    - script: echo "This is NOT a PR build"
+      displayName: 'Not a PR'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    # CONDITION: Check parameter is not empty
+    - script: echo "Version is ${{ parameters.version }}"
+      displayName: 'Version Check'
+      condition: ne('${{ parameters.version }}', '')
+
+    # CONDITION: Contains check
+    - script: echo "Branch contains 'feature'"
+      displayName: 'Feature Branch'
+      condition: contains(variables['Build.SourceBranch'], 'feature')
+
+    # CONDITION: StartsWith check
+    - script: echo "Branch starts with refs/heads/"
+      displayName: 'Branch Prefix Check'
+      condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
+
+    # CONDITION: succeededOrFailed - Run even if previous steps failed
+    - script: echo "Cleanup - runs on success or failure"
+      displayName: 'Cleanup Step'
+      condition: succeededOrFailed()
+
+# ============================================
+# CONDITION REFERENCE CHEAT SHEET
+# ============================================
+# eq(value1, value2)         - Equals
+# ne(value1, value2)         - Not equals
+# gt(value1, value2)         - Greater than
+# lt(value1, value2)         - Less than
+# ge(value1, value2)         - Greater or equal
+# le(value1, value2)         - Less or equal
+# and(cond1, cond2, ...)     - All conditions true
+# or(cond1, cond2, ...)      - Any condition true
+# not(condition)             - Negation
+# succeeded()                - Previous step/job succeeded
+# failed()                   - Previous step/job failed
+# always()                   - Always run
+# canceled()                 - Pipeline was canceled
+# succeededOrFailed()        - Run on success or failure
+# contains(string, search)   - String contains
+# startsWith(string, search) - String starts with
+# endsWith(string, search)   - String ends with
+# in(value, val1, val2, ...) - Value in list

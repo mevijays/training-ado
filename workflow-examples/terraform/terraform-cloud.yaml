@@ -1,0 +1,69 @@
+trigger:
+- none
+parameters:
+  - name: destroy
+    displayName: 'Destroy Infrastructure'
+    type: boolean
+    default: false
+pool:
+  vmImage: ubuntu-latest
+jobs:
+ - job: terraform
+   steps:
+   - task: TerraformInstaller@1
+     inputs:
+      terraformVersion: 'latest'
+   - task: AzureCLI@2
+     displayName: Terraform init
+     inputs:
+       azureSubscription: 'azarm'
+       scriptType: 'bash'
+       scriptLocation: 'inlineScript'
+       inlineScript: 'terraform init'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/vm'
+       visibleAzLogin: false
+     env:
+      # This maps your secret ADO variable to the Terraform variable
+      TF_VAR_admin_password: $(VM_ADMIN_PASS)
+      TF_TOKEN_app_terraform_io: $(TF_CLOUD_TOKEN)
+   - task: AzureCLI@2
+     displayName: terraform plan
+     inputs:
+       azureSubscription: 'azarm'
+       scriptType: 'bash'
+       scriptLocation: 'inlineScript'
+       inlineScript: 'terraform plan'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/vm'
+       visibleAzLogin: false
+     env:
+      # This maps your secret ADO variable to the Terraform variable
+      TF_VAR_admin_password: $(VM_ADMIN_PASS)
+      TF_TOKEN_app_terraform_io: $(TF_CLOUD_TOKEN)
+   - task: AzureCLI@2
+     displayName: terraform apply
+     condition: eq('${{ parameters.destroy }}', false)
+     inputs:
+       azureSubscription: 'azarm'
+       scriptType: 'bash'
+       scriptLocation: 'inlineScript'
+       inlineScript: 'terraform apply -auto-approve'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/vm'
+       visibleAzLogin: false
+     env:
+      # This maps your secret ADO variable to the Terraform variable
+      TF_VAR_admin_password: $(VM_ADMIN_PASS)
+      TF_TOKEN_app_terraform_io: $(TF_CLOUD_TOKEN)
+   - task: AzureCLI@2
+     displayName: terraform destroy
+     condition: eq('${{ parameters.destroy }}', true)
+     inputs:
+       azureSubscription: 'azarm'
+       scriptType: 'bash'
+       scriptLocation: 'inlineScript'
+       inlineScript: 'terraform apply -auto-approve -destroy'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/vm'
+       visibleAzLogin: false
+     env:
+      # This maps your secret ADO variable to the Terraform variable
+      TF_VAR_admin_password: $(VM_ADMIN_PASS)
+      TF_TOKEN_app_terraform_io: $(TF_CLOUD_TOKEN)

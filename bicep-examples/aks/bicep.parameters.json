@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "value": "rg-demo-aks"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "clusterName": {
+            "value": "aks-demo"
+        },
+        "dnsPrefix": {
+            "value": "aksdemo"
+        },
+        "kubernetesVersion": {
+            "value": "1.28"
+        },
+        "nodeCount": {
+            "value": 2
+        },
+        "nodeVmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "enableAutoScaling": {
+            "value": true
+        },
+        "minNodeCount": {
+            "value": 1
+        },
+        "maxNodeCount": {
+            "value": 5
+        },
+        "networkPlugin": {
+            "value": "azure"
+        },
+        "tags": {
+            "value": {
+                "environment": "demo",
+                "managed_by": "bicep"
+            }
+        }
+    }
+}

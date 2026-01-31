@@ -1,0 +1,36 @@
+# -------------------------------------------
+# How to use Azure Key Vault secrets in pipeline
+# -------------------------------------------
+
+# Step 1: In Azure Portal, create a Key Vault
+#         - Give it a unique name, select resource group and region.
+#         - In Access Policies, add the user/service principal with Get and List secret permissions[6][8].
+
+# Step 2: In Azure DevOps, create a Service Connection to Azure
+#         - Go to Project Settings > Pipelines > Service connections.
+#         - Click New service connection > Azure Resource Manager, select Service Principal (automatic).
+#         - Make sure "Grant access permission to all pipelines" is enabled.
+#         - Ensure the service principal has Get/List secret permissions on Key Vault[6][8].
+
+trigger:
+- none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  # Step 3: Fetch Key Vault secrets using the service connection
+  - task: AzureKeyVault@2
+    inputs:
+      azureSubscription: 'MyKeyVaultConnection'    # Name of the DevOps service connection you created
+      KeyVaultName: 'MyDemoKeyVault'               # Name of your Azure Key Vault
+      SecretsFilter: 'DBPassword,ApiKey'           # Comma-separated list of secret names to fetch
+    displayName: 'Fetch secrets from Azure Key Vault'
+    # The secrets 'DBPassword' and 'ApiKey' are now available as pipeline variables
+
+  # Step 4: Use the Key Vault secrets in your steps
+  - script: |
+      echo "Fetched DB password: $(DBPassword)"
+      echo "Fetched API key: $(ApiKey)"
+    displayName: 'Show Key Vault secrets'
+    # Note: Secret values are masked from logs unless written explicitly

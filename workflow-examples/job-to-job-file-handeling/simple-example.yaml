@@ -1,0 +1,34 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - job: fileUpload
+    steps:
+      - script: |
+          mkdir notes
+          echo "creating this file" > notes/mynotes.txt
+        displayName: creating file
+      - script: pwd && ls
+        displayName:  displaying file location
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(System.DefaultWorkingDirectory)/notes'
+          artifact: 'myNotes'
+          publishLocation: 'pipeline'
+  - job: downloadFile
+    dependsOn: fileUpload
+    condition: succeeded()
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'myNotes'
+          targetPath: '$(System.DefaultWorkingDirectory)/notes'
+      - script: |
+          pwd 
+          echo $(System.DefaultWorkingDirectory)
+          echo $(Pipeline.Workspace)
+          ls -lhtr
+          cat notes/mynotes.txt || true
