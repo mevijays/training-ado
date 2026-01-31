@@ -1,0 +1,113 @@
+# Azure DevOps PR Trigger Demo
+# Runs when a PR is created targeting the main branch
+
+# ============================================
+# SETUP INSTRUCTIONS (Do this FIRST!)
+# ============================================
+# 1. Create a pipeline from this YAML file:
+#    Pipelines → New Pipeline → Azure Repos Git → Select this file
+#
+# 2. Configure Branch Policy (Required for PR validation):
+#    Repos → Branches → main → (⋮ menu) → Branch policies
+#
+# 3. Under "Build validation" section:
+#    - Click "+ Add build policy"
+#    - Build pipeline: Select this pipeline
+#    - Trigger: Automatic
+#    - Policy requirement: Required (blocks merge if fails)
+#    - Build expiration: Immediately (or after X hours)
+#    - Display name: "PR Validation"
+#    - Click Save
+#
+# 4. Optional - Additional branch policies:
+#    - Require minimum number of reviewers
+#    - Check for linked work items
+#    - Check for comment resolution
+#
+# NOTE: When using Branch Policies, the policy OVERRIDES
+#       the YAML pr: trigger below. The pipeline will run
+#       based on the policy settings, not the YAML.
+# ============================================
+
+# Disable CI trigger (only run on PR)
+trigger:
+- none
+
+# PR trigger configuration (for repos without branch policies)
+pr:
+  branches:
+    include:
+    - main        # Target branch
+  paths:
+    exclude:
+    - '*.md'      # Skip if only docs changed
+    - 'docs/*'
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: PRValidation
+  displayName: 'PR Validation'
+  steps:
+  
+  # Show PR info
+  - script: |
+      echo "=========================================="
+      echo "Pull Request Build Triggered!"
+      echo "=========================================="
+      echo "PR ID: $(System.PullRequest.PullRequestId)"
+      echo "Source Branch: $(System.PullRequest.SourceBranch)"
+      echo "Target Branch: $(System.PullRequest.TargetBranch)"
+      echo "Build Reason: $(Build.Reason)"
+      echo "=========================================="
+    displayName: 'PR Information'
+
+  # Lint check
+  - script: echo "Running lint checks..."
+    displayName: 'Lint'
+
+  # Build
+  - script: echo "Building application..."
+    displayName: 'Build'
+
+  # Unit tests
+  - script: echo "Running unit tests..."
+    displayName: 'Unit Tests'
+
+  # Code coverage
+  - script: echo "Generating code coverage report..."
+    displayName: 'Code Coverage'
+
+  # Security scan
+  - script: echo "Running security scan..."
+    displayName: 'Security Scan'
+
+  # PR comment (summary)
+  - script: echo "PR validation completed successfully!"
+    displayName: 'Validation Complete'
+
+# ============================================
+# PR TRIGGER OPTIONS REFERENCE
+# ============================================
+# pr:
+#   autoCancel: true          # Cancel old builds when new commits pushed
+#   drafts: false             # Don't run on draft PRs
+#   branches:
+#     include:
+#     - main
+#     - develop
+#     exclude:
+#     - 'releases/*'
+#   paths:
+#     include:
+#     - 'src/*'
+#     exclude:
+#     - '*.md'
+#
+# PR Variables available:
+# - $(System.PullRequest.PullRequestId)
+# - $(System.PullRequest.SourceBranch)
+# - $(System.PullRequest.TargetBranch)
+# - $(Build.Reason) = 'PullRequest'
+# ============================================
