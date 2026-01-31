@@ -1,0 +1,123 @@
+# Azure DevOps Approval & Deployment Demo
+# Uses environments with approval gates for controlled deployments
+
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+# ============================================
+# STAGES WITH ENVIRONMENT APPROVALS
+# ============================================
+stages:
+
+# ------------------------------------------
+# STAGE 1: Build (No approval needed)
+# ------------------------------------------
+- stage: Build
+  displayName: 'Build Application'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build'
+    steps:
+    - script: echo "Building application..."
+      displayName: 'Build Step'
+    - script: echo "Running unit tests..."
+      displayName: 'Unit Tests'
+    - script: echo "Build completed successfully!"
+      displayName: 'Build Complete'
+
+# ------------------------------------------
+# STAGE 2: Deploy to Dev (No approval)
+# ------------------------------------------
+- stage: DeployDev
+  displayName: 'Deploy to Dev'
+  dependsOn: Build
+  jobs:
+  - deployment: DeployDevJob
+    displayName: 'Deploy to Dev Environment'
+    environment: 'dev'  # No approval configured
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo "Deploying to DEV environment..."
+            displayName: 'Deploy to Dev'
+          - script: echo "Dev deployment complete!"
+            displayName: 'Dev Complete'
+
+# ------------------------------------------
+# STAGE 3: Deploy to UAT (Approval required)
+# ------------------------------------------
+- stage: DeployUAT
+  displayName: 'Deploy to UAT'
+  dependsOn: DeployDev
+  jobs:
+  - deployment: DeployUATJob
+    displayName: 'Deploy to UAT Environment'
+    environment: 'uat'  # Configure approval in Azure DevOps UI
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo "Deploying to UAT environment..."
+            displayName: 'Deploy to UAT'
+          - script: echo "Running integration tests..."
+            displayName: 'Integration Tests'
+          - script: echo "UAT deployment complete!"
+            displayName: 'UAT Complete'
+
+# ------------------------------------------
+# STAGE 4: Deploy to Prod (Approval required)
+# ------------------------------------------
+- stage: DeployProd
+  displayName: 'Deploy to Production'
+  dependsOn: DeployUAT
+  jobs:
+  - deployment: DeployProdJob
+    displayName: 'Deploy to Prod Environment'
+    environment: 'prod'  # Configure approval in Azure DevOps UI
+    strategy:
+      runOnce:
+        preDeploy:
+          steps:
+          - script: echo "Pre-deployment checks..."
+            displayName: 'Pre-Deploy Checks'
+        deploy:
+          steps:
+          - script: echo "Deploying to PRODUCTION environment..."
+            displayName: 'Deploy to Prod'
+          - script: echo "Production deployment complete!"
+            displayName: 'Prod Complete'
+        postRouteTraffic:
+          steps:
+          - script: echo "Running smoke tests..."
+            displayName: 'Smoke Tests'
+        on:
+          success:
+            steps:
+            - script: echo "Deployment succeeded! Sending notification..."
+              displayName: 'Success Notification'
+          failure:
+            steps:
+            - script: echo "Deployment failed! Initiating rollback..."
+              displayName: 'Failure Handler'
+
+# ============================================
+# HOW TO CONFIGURE APPROVALS IN AZURE DEVOPS
+# ============================================
+# 1. Go to Pipelines > Environments
+# 2. Click on environment (e.g., 'prod')
+# 3. Click "Approvals and checks" (top right)
+# 4. Add "Approvals" check
+# 5. Add approvers (users or groups)
+# 6. Optional: Set timeout, instructions, minimum approvers
+#
+# Other checks you can add:
+# - Branch control (only deploy from main)
+# - Business hours (deploy only during work hours)
+# - Invoke Azure Function (custom validation)
+# - Invoke REST API (external approval system)
+# - Required template (enforce pipeline templates)
+# ============================================
