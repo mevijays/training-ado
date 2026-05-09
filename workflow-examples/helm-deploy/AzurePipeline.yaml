@@ -1,29 +1,93 @@
-trigger: none
-
+name: "build deploy"
+trigger:
+ - none
+parameters:
+  - name: relVersion
+    displayName: Release version
+    type: string
+    default: 0.0.1-SNAPSHOT
 pool:
   vmImage: ubuntu-latest
-
-steps:
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'Az-connect'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      echo " Logging into acr"
-      az acr login -n mevijay
-      docker build -t mevijay.azurecr.io/hello-java:$(Build.BuildId) . -f stagedockerbuild.dockerfile 
-      docker push mevijay.azurecr.io/hello-java:$(Build.BuildId)
-- task: HelmDeploy@1
-  inputs:
-    connectionType: 'Azure Resource Manager'
-    azureSubscription: 'Az-connect'
-    azureResourceGroup: 'dev'
-    kubernetesCluster: 'myaks'
-    useClusterAdmin: true
-    command: 'upgrade'
-    chartType: 'FilePath'
-    chartPath: './helm'
-    releaseName: 'myapp'
-    namespace: 'default'
-    overrideValues: 'image.tag=$(Build.BuildId)'
+jobs:
+  - job: 'mavenbuild'
+    displayName: maven build job
+    pool:
+      name: ado-pool
+    steps:
+      - bash: |
+          mvn -version
+          java -version
+        displayName: checking maven and java version
+      - task: MavenAuthenticate@0
+        inputs:
+          artifactsFeeds: 'mevijays'
+      - task: Maven@4
+        inputs:
+          mavenPomFile: 'pom.xml'
+          goals: 'clean deploy'
+          options: '-Drevision=${{ parameters.relVersion }}'
+          publishJUnitResults: true
+          testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          codeCoverageToolOption: 'JaCoCo'
+          javaHomeOption: 'JDKVersion'
+          mavenVersionOption: 'Default'
+          mavenAuthenticateFeed: false
+          effectivePomSkip: false
+          sonarQubeRunAnalysis: false
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(System.DefaultWorkingDirectory)/target'
+          artifact: 'target'
+          publishLocation: 'pipeline'
+  - job: dockerBuild
+    displayName: Docker container build
+    dependsOn: 'mavenbuild'
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'target'
+          targetPath: '$(System.DefaultWorkingDirectory)/target'
+      - task: AzureCLI@3
+        inputs:
+          connectionType: 'azureRM'
+          azureSubscription: 'azdc'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az acr login -n krlabacr
+            docker build -t krlabacr.azurecr.io/addressbook:$(Build.BuildId) . -f Dockerfile
+            docker push krlabacr.azurecr.io/addressbook:$(Build.BuildId)
+        displayName:  build and push to acr
+  - job: helmPackage
+    displayName: packaging helm chart version
+    dependsOn: dockerBuild
+    steps:
+      - task: AzureCLI@3
+        inputs:
+          connectionType: 'azureRM'
+          azureSubscription: 'azdc'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az acr login -n krlabacr
+            helm package ./helm/addressbook --version 0.0.$(Build.BuildId)
+            helm push addressbook-0.0.$(Build.BuildId).tgz oci://krlabacr.azurecr.io/helm
+  - job: helmDeploy
+    displayName:  Helm install
+    dependsOn: helmPackage
+    steps:
+      - task: AzureCLI@3
+        inputs:
+          connectionType: 'azureRM'
+          azureSubscription: 'azdc'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az aks get-credentials --resource-group aksrg --name devaks --overwrite-existing
+            az acr login -n krlabacr
+            helm upgrade --install myapp \
+              oci://krlabacr.azurecr.io/helm/addressbook \
+              --version 0.0.$(Build.BuildId) \
+              --set image.repository=krlabacr.azurecr.io/addressbook \
+              --set image.tag=$(Build.BuildId) \
