@@ -1,0 +1,39 @@
+# Name of this pipeline in Azure DevOps UI: "Upstream-CI"
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: BuildJob
+  steps:
+  - script: echo "Running the Upstream Build..."
+    displayName: 'Compile Step'
+  - script: echo "Build complete. Ready for downstream."
+    displayName: 'Finalize Step'
+
+# Name of this pipeline in Azure DevOps UI: "Downstream-CD"
+
+trigger: none # Disable standard code-commit triggers if you only want it to run after Upstream
+
+resources:
+  pipelines:
+  - pipeline: MyUpstreamAlias    # A local nickname for the upstream pipeline
+    source: Upstream-CI          # MUST match the 'Name' of the upstream pipeline in ADO
+    trigger: 
+      branches:
+        include:
+        - main                   # Only trigger if Upstream finishes on the main branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: DeployJob
+  steps:
+  - script: echo "Upstream pipeline has finished!"
+    displayName: 'Detect Trigger'
+  - script: echo "Deploying the artifacts now..."
+    displayName: 'Deployment Step'
