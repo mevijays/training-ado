@@ -15,7 +15,7 @@ Useful for both **students** preparing for AZ-400 and **trainers** running struc
 | Exam sandbox | https://go.microsoft.com/fwlink/?linkid=2226877 |
 | Course content (start here) | [course-content/README.md](course-content/README.md) |
 | Capstone project | [project/README.md](project/README.md) |
-| **Sample exam (60 MCQs)** | **[sample_exam/exam.md](sample_exam/exam.md)** |
+| **Sample exam (60 MCQs)** | **[docs/exam.md](docs/exam.md)** |
 | GenAI for DevOps engineers | [genai/README.md](genai/README.md) |
 
 ---
@@ -79,7 +79,8 @@ training-ado/
 ├── README.md                ← you are here
 ├── course-content/          ← 22 modules + exam prep
 ├── project/                 ← capstone: end-to-end CI/CD (with reference solution)
-├── sample_exam/             ← 60 practice MCQs with answers + explanations
+├── docs/                    ← interactive exam simulator (GitHub Pages source) + 60 MCQs
+├── documentation/           ← AzureDevOps PDFs (renamed from docs/ to free that name for GH Pages)
 └── genai/                   ← GenAI in DevOps workflows
 ```
 
