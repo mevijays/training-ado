@@ -1,121 +1,93 @@
-# Azure DevOps training
-## Training Modules
-# Module 1: Introduction to DevOps and Azure DevOps
+# Azure DevOps Training Curriculum — AZ-400
 
-- What is DevOps?
-- Principles and benefits
-- DevOps practices (CI/CD, Infrastructure as Code, etc.)
-- DevOps culture and collaboration
-- Introduction to Azure DevOps
-- Overview of Azure DevOps services (Azure Boards, Azure Repos, Azure Pipelines, Azure Test Plans, Azure Artifacts)
-- Navigating the Azure DevOps portal
-- Creating an Azure DevOps organization and project
+A complete, self-paced curriculum for the **Microsoft Certified: DevOps Engineer Expert** (exam **AZ-400**), aligned to the latest April 2026 skills outline. Heavy emphasis on CI/CD pipelines (50-55% of the exam), with full coverage of source control, security, instrumentation, SRE, and process.
 
-# Module 2: Version Control with Git
+Useful for both **students** preparing for AZ-400 and **trainers** running structured sessions. Every topic has theory with analogies and a hands-on lab.
 
-- Introduction to Git
-- What is version control and why it's important
-- Basic Git concepts (repository, commit, branch, merge)
-- Essential Git Commands
-  - `git init`, `git clone`, `git add`, `git commit`, `git push`, `git pull`, `git status`
-  - `git branch`, `git checkout`, `git merge`
-  - `git log`
-  - `git diff`
-- Working with Remotes (GitHub/Azure Repos)
-  - Connecting to remote repositories
-  - Pushing and pulling changes
-  - Forking and contributing to projects
-- Resolving Merge Conflicts
-  - Understanding merge conflicts
-  - Strategies for resolving conflicts
+---
 
-# Module 3: Agile Planning and Collaboration with Azure Boards
+## Quick links
 
-- Agile Fundamentals
-  - Agile principles and values
-  - Scrum framework overview
-  - Kanban methodology
-- Azure Boards for Project Management
-  - Creating work items (user stories, tasks, bugs)
-  - Managing backlogs and sprints
-  - Tracking progress with Kanban boards and task boards
-  - Customizing work item types and workflows
-- Collaboration and Communication in Azure Boards
-  - Using discussions and mentions
-  - Integrating with Microsoft Teams
+| Resource | Link |
+|---|---|
+| Official Study Guide AZ-400 | https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400 |
+| Official AZ-400 Microsoft Learning labs | https://microsoftlearning.github.io/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions/ |
+| Exam sandbox | https://go.microsoft.com/fwlink/?linkid=2226877 |
+| Course content (start here) | [course-content/README.md](course-content/README.md) |
+| Capstone project | [project/README.md](project/README.md) |
+| GenAI for DevOps engineers | [genai/README.md](genai/README.md) |
 
-# Module 4: Software development and Build tools
+---
 
-- Java backend application building with maven.
-- What is maven and gradle? Understanding pom.xml and settings.xml
-- What is is artifactories and how do we store artifacts to them.
-- Nodejs and npm build to frontend application.
-- Nuget and dotnet packages
+## Exam at a glance
 
-# Module 5: Building and Deploying Applications with Azure Pipelines
+| Field | Value |
+|---|---|
+| Code | AZ-400 |
+| Format | MCQ + case studies (rarely labs now) |
+| Duration | 120 min |
+| Question count | 40-60 |
+| Passing score | 700/1000 |
+| Validity | 1 year + free renewal |
+| Cost | $165 USD |
+| Prerequisite (not required but expected) | AZ-104 or AZ-204 knowledge |
 
-- Azure Kubernetes services and its authentication/connection with Azure pipeline.
-- Using Azure container registry for container image publishing.
-- Private self hosted agent.
-- Containerising java application end to end with Azure CICD pipeline.
-- Continuous Integration (CI) with Azure Pipelines
-  - Understanding CI principles
-  - Creating build pipelines
-  - Defining build tasks (build, test, package)
-  - Using different build agents (Microsoft-hosted, self-hosted)
-- Continuous Delivery (CD) with Azure Pipelines
-  - Understanding CD principles
-  - Creating release pipelines
-  - Deploying to various environments (development, staging, production)
-- Infrastructure as Code (IaC)
-  - Introduction to IaC concepts
-  - Provisioning infrastructure with Azure Pipelines
-- Building docker images and understanding dockerfile for containerisation.
-- Docker registry ACR, dockerhub, harbor.
-- Understanding functional and non functional testing.
-- Writing workflows
-- Variables and parameterisation
-- Managing secrets from variable and azure vault
-- Using templates in workflow.
-- Workflow syntax and azure devops pipeline tasks
+---
 
-# Module 6: Managing Artifacts with Azure Artifacts
+## AZ-400 — domains (April 2026 update)
 
-- Introduction to Azure Artifacts
-- Understanding package management
-- Creating and managing feeds
-- Working with Different Package Types
-  - NuGet, npm, Maven, Python packages
-- Publishing and consuming packages
-- Integrating Artifacts with Pipelines
-  - Using artifacts in build and release pipelines
+| Domain | Weight | Modules |
+|---|---|---|
+| Design and implement processes and communications | 10-15% | [01](course-content/01-devops-fundamentals.md), [02](course-content/02-azure-devops-overview.md), [03](course-content/03-agile-boards.md) |
+| Design and implement a source control strategy | 10-15% | [04](course-content/04-git-version-control.md), [05](course-content/05-branching-strategies.md), [06](course-content/06-azure-repos.md) |
+| Define and implement continuous integration | 20-25% | [07](course-content/07-build-tools-maven-npm-nuget.md), [08](course-content/08-azure-pipelines-ci.md), [09](course-content/09-pipelines-yaml-templates.md), [10](course-content/10-self-hosted-agents.md), [11](course-content/11-docker-containers.md), [12](course-content/12-container-registries.md) |
+| Define and implement a continuous delivery and release management strategy | 10-15% | [13](course-content/13-cd-deployment-strategies.md), [14](course-content/14-aks-deployment.md), [15](course-content/15-iac-with-pipelines.md), [16](course-content/16-azure-artifacts.md) |
+| Develop a security and compliance plan | 10-15% | [17](course-content/17-security-compliance.md), [18](course-content/18-secrets-keyvault.md) |
+| Develop an instrumentation strategy | 5-10% | [19](course-content/19-monitoring-instrumentation.md) |
+| Develop a Site Reliability Engineering strategy | 5-10% | [20](course-content/20-sre-strategy.md) |
+| GitHub Actions + Feature flags (cross-cutting topics) | included above | [21](course-content/21-github-actions.md), [22](course-content/22-feature-flags.md) |
 
-# Module 7: Advanced Azure DevOps Concepts
+> Note: CI/CD together makes up **50-55%** of the exam. Plan study time accordingly.
 
-- Security in Azure DevOps
-  - Managing users and permissions
-  - Implementing security best practices
-- Monitoring and Reporting
-  - Using dashboards and widgets
-  - Analyzing pipeline and test results
-- Extending Azure DevOps
-  - Using the Azure DevOps Marketplace
-- Azure load testing
-- Feature flagging in azure cloud
+---
 
-# Module 8: GitHub actions understanding
+## How to use this repo
 
-- Writing workflows and understanding syntax.
-- Selfhosted runner and runner concepts
-- Managing secrets and environment approvals
-- Reusable workflows and actions
+- **Brand new to DevOps?** Modules 1-3 set the stage. Then proceed in order.
+- **Already a developer?** Skim 1-6; spend most time on 7-22 plus the project.
+- **Trainer?** Each module is one ~60-90 min session.
 
-# Module 9: Live project works
+Each module follows: *Why this matters* → *Theory + analogies* → *Lab* → *Trainer notes* → *Next module*.
 
-- End to End backend development (java api ) automation in azure devops workflow.
-- End to End Frontend development (nodejs react ) automation in azure devops workflow.
+---
 
-## Exam materials update
-- [Exam sandbox](https://go.microsoft.com/fwlink/?linkid=2226877)
-- [Study guide AZ400](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400)
-## [Lab guide for AZ-400](https://microsoftlearning.github.io/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions/)
+## Prerequisites
+
+- Free **Azure DevOps** account: https://dev.azure.com (parallel free for 5 users + 1800 free pipeline minutes/month)
+- Free **GitHub** account
+- Free **Azure** account (for deploy targets)
+- Local tools: `git`, Docker Desktop, Node 20, Java 17, Maven, .NET 8 SDK, Azure CLI, kubectl
+- VS Code with Azure DevOps + GitHub extensions
+
+---
+
+## Repository structure
+
+```
+training-ado/
+├── README.md                ← you are here
+├── course-content/          ← 22 modules + exam prep
+├── project/                 ← capstone: end-to-end CI/CD for a real app
+└── genai/                   ← GenAI in DevOps workflows
+```
+
+Working pipeline examples live in:
+- `workflow-examples/` — Azure Pipelines YAML samples
+- `terraform/` — Terraform configs for AKS, VM
+- `bicep/`, `bicep-examples/` — Bicep templates
+
+---
+
+## License & contributions
+
+MIT license. PRs welcome.

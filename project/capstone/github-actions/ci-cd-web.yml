@@ -1,0 +1,72 @@
+# GitHub Actions equivalent of the bookstore-web Azure Pipelines pipeline.
+# Demonstrates OIDC auth to Azure with no secrets stored in GitHub.
+#
+# One-time setup:
+# 1. Create app registration + federated credential (see capstone README).
+# 2. Set repo secrets: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID.
+# 3. Move this file to .github/workflows/ in your GitHub repo.
+
+name: bookstore-web CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'project/capstone/services/bookstore-web/**'
+      - '.github/workflows/ci-cd-web.yml'
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  WEB_APP_DEV: web-blueleaf-dev
+  RG_DEV: rg-blueleaf-dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: project/capstone/services/bookstore-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: project/capstone/services/bookstore-web/package-lock.json
+      - name: Install + test
+        run: |
+          npm ci || npm install
+          npm test --if-present
+      - name: Package
+        run: |
+          mkdir -p ../../../../dist
+          zip -r ../../../../dist/web.zip . -x '*.git*' 'node_modules/.cache/*'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-zip
+          path: dist/web.zip
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-zip
+          path: dist
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy
+        run: |
+          az webapp deploy -g $RG_DEV -n $WEB_APP_DEV \
+            --src-path dist/web.zip --type zip

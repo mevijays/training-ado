@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookstore-worker
+  namespace: blueleaf
+  labels: { app: bookstore-worker }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: bookstore-worker }
+  template:
+    metadata:
+      labels: { app: bookstore-worker }
+    spec:
+      containers:
+        - name: worker
+          image: REPLACE_ACR.azurecr.io/bookstore-worker:latest
+          env:
+            - name: POLL_INTERVAL_SECONDS
+              value: "30"
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits:   { cpu: 250m, memory: 256Mi }

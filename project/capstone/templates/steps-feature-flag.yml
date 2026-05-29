@@ -1,0 +1,28 @@
+# Reusable: fail the pipeline if a "deploy-freeze" flag is on in Azure App Configuration.
+parameters:
+  - name: serviceConnection
+    type: string
+    default: 'sc-azure'
+  - name: configStoreName
+    type: string
+  - name: flagName
+    type: string
+    default: 'deploy-freeze'
+
+steps:
+  - task: AzureCLI@2
+    displayName: 'Check feature flag: ${{ parameters.flagName }}'
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        STATE=$(az appconfig feature show \
+          --name ${{ parameters.configStoreName }} \
+          --feature ${{ parameters.flagName }} \
+          --query state -o tsv)
+        echo "Flag '${{ parameters.flagName }}' is: $STATE"
+        if [ "$STATE" = "on" ]; then
+          echo "##vso[task.logissue type=error]Deploys are frozen by feature flag."
+          exit 1
+        fi

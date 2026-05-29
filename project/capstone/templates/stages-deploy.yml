@@ -1,0 +1,40 @@
+# Reusable deploy stage. Deploys an image to AKS via KubernetesManifest task.
+parameters:
+  - name: env
+    type: string
+    values: [dev, stage, prod]
+  - name: dependsOn
+    type: string
+    default: ''
+  - name: serviceConnection
+    type: string
+    default: 'sc-azure'
+  - name: aksServiceConnection
+    type: string
+    default: 'aks-blueleaf-sc'
+  - name: namespace
+    type: string
+  - name: manifests
+    type: string
+  - name: containers
+    type: string
+
+stages:
+  - stage: Deploy_${{ parameters.env }}
+    ${{ if ne(parameters.dependsOn, '') }}:
+      dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+      - deployment: deploy
+        environment: ${{ parameters.env }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: deploy
+                    kubernetesServiceConnection: ${{ parameters.aksServiceConnection }}
+                    namespace: ${{ parameters.namespace }}
+                    manifests: ${{ parameters.manifests }}
+                    containers: ${{ parameters.containers }}

@@ -1,0 +1,54 @@
+# bookstore-worker pipeline — Python ingest worker, deployed to AKS.
+
+trigger:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/services/bookstore-worker/**
+      - project/capstone/pipelines/bookstore-worker.yml
+
+pr:
+  branches: { include: [main] }
+
+variables:
+  - group: blueleaf-shared
+  - name: serviceDir
+    value: 'project/capstone/services/bookstore-worker'
+  - name: imageName
+    value: 'bookstore-worker'
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: build_and_scan
+        steps:
+          - template: ../templates/steps-build-python.yml
+            parameters:
+              pythonVersion: '3.12'
+              workingDirectory: $(serviceDir)
+
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanSecrets: true
+
+          - template: ../templates/steps-docker-build-push.yml
+            parameters:
+              acrName: $(acrName)
+              imageName: $(imageName)
+              dockerContext: $(serviceDir)
+
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanImage: true
+              imageRef: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
+
+  - template: ../templates/stages-deploy.yml
+    parameters:
+      env: dev
+      dependsOn: Build
+      namespace: 'blueleaf'
+      manifests: 'project/capstone/k8s/worker.yaml'
+      containers: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'

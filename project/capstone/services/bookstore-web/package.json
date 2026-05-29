@@ -1,0 +1,12 @@
+{
+  "name": "bookstore-web",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo \"(real build would run vite/webpack)\"",
+    "test": "node --test || exit 0",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

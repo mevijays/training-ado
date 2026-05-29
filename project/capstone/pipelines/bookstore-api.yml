@@ -1,0 +1,71 @@
+# bookstore-api pipeline — Java Spring Boot service.
+# Build → security scan → containerize → push → deploy to AKS via Helm/kubectl.
+
+trigger:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/services/bookstore-api/**
+      - project/capstone/pipelines/bookstore-api.yml
+
+pr:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/services/bookstore-api/**
+
+variables:
+  - group: blueleaf-shared          # contains: acrName, aksName, rgName
+  - name: serviceDir
+    value: 'project/capstone/services/bookstore-api'
+  - name: imageName
+    value: 'bookstore-api'
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: build_and_scan
+        steps:
+          - template: ../templates/steps-build-java.yml
+            parameters:
+              javaVersion: '17'
+              workingDirectory: $(serviceDir)
+              artifactName: 'api-jar'
+
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanSecrets: true
+
+          - template: ../templates/steps-docker-build-push.yml
+            parameters:
+              acrName: $(acrName)
+              imageName: $(imageName)
+              dockerContext: $(serviceDir)
+              tags:
+                - '$(Build.BuildId)'
+                - 'latest'
+
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanSecrets: false
+              scanImage: true
+              imageRef: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
+
+  - template: ../templates/stages-deploy.yml
+    parameters:
+      env: dev
+      dependsOn: Build
+      namespace: 'blueleaf'
+      manifests: 'project/capstone/k8s/api.yaml'
+      containers: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
+
+  - template: ../templates/stages-deploy.yml
+    parameters:
+      env: prod
+      dependsOn: Deploy_dev
+      namespace: 'blueleaf'
+      manifests: 'project/capstone/k8s/api.yaml'
+      containers: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'

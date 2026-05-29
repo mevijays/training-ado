@@ -1,0 +1,67 @@
+# Infra pipeline: Bicep what-if on PR, deploy on merge.
+
+trigger:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/infra/**
+      - project/capstone/pipelines/bookstore-infra.yml
+
+pr:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/infra/**
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: blueleaf-shared       # contains rgName
+  - name: bicepRoot
+    value: 'project/capstone/infra'
+
+stages:
+  - stage: Plan
+    jobs:
+      - job: whatif
+        steps:
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanSecrets: true
+              scanIaC: true
+              iacPath: $(bicepRoot)
+          - task: AzureCLI@2
+            displayName: 'az deployment group what-if (dev)'
+            inputs:
+              azureSubscription: 'sc-azure'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az group create -n $(rgName)-dev -l eastus
+                az deployment group what-if \
+                  -g $(rgName)-dev \
+                  -f $(bicepRoot)/main.bicep \
+                  -p @$(bicepRoot)/dev.parameters.json
+
+  - stage: Apply
+    dependsOn: Plan
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: apply
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az deployment group create \
+                        -g $(rgName)-dev \
+                        -f $(bicepRoot)/main.bicep \
+                        -p @$(bicepRoot)/dev.parameters.json

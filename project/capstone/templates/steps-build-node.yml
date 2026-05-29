@@ -1,0 +1,47 @@
+# Reusable Node.js build steps.
+parameters:
+  - name: nodeVersion
+    type: string
+    default: '20.x'
+  - name: workingDirectory
+    type: string
+    default: '$(Build.SourcesDirectory)'
+  - name: publishArtifact
+    type: boolean
+    default: true
+  - name: artifactName
+    type: string
+    default: 'app'
+
+steps:
+  - task: NodeTool@0
+    inputs: { versionSpec: ${{ parameters.nodeVersion }} }
+    displayName: 'Use Node ${{ parameters.nodeVersion }}'
+
+  - task: Cache@2
+    inputs:
+      key: 'npm | "$(Agent.OS)" | ${{ parameters.workingDirectory }}/package-lock.json'
+      path: '~/.npm'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+    displayName: 'Cache npm'
+
+  - script: npm ci
+    workingDirectory: ${{ parameters.workingDirectory }}
+    displayName: 'npm ci'
+
+  - script: npm run build --if-present
+    workingDirectory: ${{ parameters.workingDirectory }}
+    displayName: 'Build'
+
+  - script: npm test --if-present
+    workingDirectory: ${{ parameters.workingDirectory }}
+    displayName: 'Test'
+
+  - ${{ if eq(parameters.publishArtifact, true) }}:
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '${{ parameters.workingDirectory }}'
+          artifactName: ${{ parameters.artifactName }}
+        condition: succeeded()
+        displayName: 'Publish artifact'

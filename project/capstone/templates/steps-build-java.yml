@@ -1,0 +1,42 @@
+# Reusable Java/Maven build steps.
+parameters:
+  - name: javaVersion
+    type: string
+    default: '17'
+  - name: workingDirectory
+    type: string
+    default: '$(Build.SourcesDirectory)'
+  - name: artifactName
+    type: string
+    default: 'jar'
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: ${{ parameters.javaVersion }}
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Use JDK ${{ parameters.javaVersion }}'
+
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)" | ${{ parameters.workingDirectory }}/pom.xml'
+      path: '$(HOME)/.m2/repository'
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+    displayName: 'Cache .m2'
+
+  - task: Maven@4
+    inputs:
+      mavenPomFile: '${{ parameters.workingDirectory }}/pom.xml'
+      goals: 'clean verify'
+      options: '-B -DskipITs=false'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    displayName: 'Build and test'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '${{ parameters.workingDirectory }}/target'
+      artifactName: ${{ parameters.artifactName }}
+    condition: succeeded()

@@ -1,0 +1,38 @@
+# Reusable security scans: secrets, deps, image, IaC.
+parameters:
+  - name: scanSecrets
+    type: boolean
+    default: true
+  - name: scanImage
+    type: boolean
+    default: false
+  - name: imageRef
+    type: string
+    default: ''
+  - name: scanIaC
+    type: boolean
+    default: false
+  - name: iacPath
+    type: string
+    default: ''
+
+steps:
+  - ${{ if eq(parameters.scanSecrets, true) }}:
+      - script: |
+          docker run --rm -v $(Build.SourcesDirectory):/repo \
+            zricethezav/gitleaks:latest detect --source=/repo --no-banner
+        displayName: 'Secret scan (gitleaks)'
+
+  - ${{ if eq(parameters.scanImage, true) }}:
+      - script: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image --severity HIGH,CRITICAL \
+            --exit-code 1 ${{ parameters.imageRef }}
+        displayName: 'Image scan (Trivy)'
+
+  - ${{ if eq(parameters.scanIaC, true) }}:
+      - script: |
+          pip install checkov
+          checkov -d ${{ parameters.iacPath }} --soft-fail
+        displayName: 'IaC scan (Checkov)'

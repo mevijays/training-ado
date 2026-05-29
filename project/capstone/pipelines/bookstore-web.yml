@@ -1,0 +1,115 @@
+# bookstore-web pipeline — React/Node frontend, deployed to App Service slot.
+
+trigger:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/services/bookstore-web/**
+      - project/capstone/pipelines/bookstore-web.yml
+
+pr:
+  branches: { include: [main] }
+  paths:
+    include:
+      - project/capstone/services/bookstore-web/**
+
+variables:
+  - group: blueleaf-shared
+  - name: serviceDir
+    value: 'project/capstone/services/bookstore-web'
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: build_and_scan
+        steps:
+          - template: ../templates/steps-build-node.yml
+            parameters:
+              nodeVersion: '20.x'
+              workingDirectory: $(serviceDir)
+              artifactName: 'web-app'
+
+          - template: ../templates/steps-security-scan.yml
+            parameters:
+              scanSecrets: true
+
+  - stage: Deploy_dev
+    dependsOn: Build
+    jobs:
+      - deployment: deploy
+        environment: dev
+        variables:
+          rgName: 'rg-blueleaf-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: 'web-app'
+                # Actual web app name includes a uniqueString() hash from Bicep,
+                # so we look it up by prefix rather than hardcoding.
+                - task: AzureCLI@2
+                  name: lookup
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      NAME=$(az webapp list -g $(rgName) \
+                        --query "[?starts_with(name,'web-blueleaf-dev')].name | [0]" -o tsv)
+                      echo "Resolved web app: $NAME"
+                      echo "##vso[task.setvariable variable=webAppName;isOutput=true]$NAME"
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    appType: webAppLinux
+                    appName: $(lookup.webAppName)
+                    package: '$(Pipeline.Workspace)/web-app'
+
+  - stage: Deploy_prod
+    dependsOn: Deploy_dev
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    jobs:
+      - deployment: deploy
+        environment: prod   # add manual approval in the environment settings
+        variables:
+          rgName: 'rg-blueleaf-prod'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: 'web-app'
+                - task: AzureCLI@2
+                  name: lookup
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      NAME=$(az webapp list -g $(rgName) \
+                        --query "[?starts_with(name,'web-blueleaf-prod')].name | [0]" -o tsv)
+                      echo "Resolved web app: $NAME"
+                      echo "##vso[task.setvariable variable=webAppName;isOutput=true]$NAME"
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    appType: webAppLinux
+                    appName: $(lookup.webAppName)
+                    deployToSlotOrASE: true
+                    resourceGroupName: $(rgName)
+                    slotName: 'staging'
+                    package: '$(Pipeline.Workspace)/web-app'
+                - task: AzureAppServiceManage@0
+                  displayName: 'Swap staging → production'
+                  inputs:
+                    azureSubscription: 'sc-azure'
+                    Action: 'Swap Slots'
+                    WebAppName: $(lookup.webAppName)
+                    ResourceGroupName: $(rgName)
+                    SourceSlot: 'staging'
