@@ -1,0 +1,654 @@
+{
+  "title": "AZ-400 — Azure DevOps Engineer Expert Practice Exam",
+  "passingScore": 70,
+  "questions": [
+    { "id": "Q1", "domain": "Process", "type": "single",
+      "stem": "Which DevOps practice most directly reduces it works on my machine issues?",
+      "options": [
+        { "id": "A", "text": "Daily standups" },
+        { "id": "B", "text": "Infrastructure as Code" },
+        { "id": "C", "text": "Story-point estimation" },
+        { "id": "D", "text": "Burndown charts" }
+      ],
+      "correct": ["B"],
+      "explanation": "IaC means dev/stage/prod come from the same code. Standups and estimation are process tools but don't address environment drift directly."
+    },
+    { "id": "Q2", "domain": "Process", "type": "single",
+      "stem": "DORA's four key metrics include all EXCEPT:",
+      "options": [
+        { "id": "A", "text": "Deployment frequency" },
+        { "id": "B", "text": "Lead time for changes" },
+        { "id": "C", "text": "Story points completed per sprint" },
+        { "id": "D", "text": "Change failure rate" }
+      ],
+      "correct": ["C"],
+      "explanation": "DORA: Deployment frequency, Lead time, Change failure rate, MTTR (plus Reliability in newer reports). Story points are Agile."
+    },
+    { "id": "Q3", "domain": "Boards", "type": "single",
+      "stem": "Which Azure Boards work-item type sits ABOVE a User Story in the default Agile process?",
+      "options": [
+        { "id": "A", "text": "Task" },
+        { "id": "B", "text": "Bug" },
+        { "id": "C", "text": "Feature" },
+        { "id": "D", "text": "Test Case" }
+      ],
+      "correct": ["C"],
+      "explanation": "Agile hierarchy: Epic → Feature → User Story → Task / Bug."
+    },
+    { "id": "Q4", "domain": "Boards", "type": "multi",
+      "stem": "Which are typical components of an Azure DevOps organization? (Choose three.)",
+      "options": [
+        { "id": "A", "text": "Projects" },
+        { "id": "B", "text": "Service connections" },
+        { "id": "C", "text": "Variable groups" },
+        { "id": "D", "text": "Resource Groups" }
+      ],
+      "correct": ["A", "B", "C"],
+      "explanation": "Resource Groups are an Azure (cloud) concept, not Azure DevOps."
+    },
+    { "id": "Q5", "domain": "Boards", "type": "single",
+      "stem": "To link a Git commit to an Azure Boards work item #42, include in the commit message:",
+      "options": [
+        { "id": "A", "text": "Fixes #42" },
+        { "id": "B", "text": "AB#42" },
+        { "id": "C", "text": "WI:42" },
+        { "id": "D", "text": "[boards] 42" }
+      ],
+      "correct": ["B"],
+      "explanation": "AB#42 is the syntax Azure Boards parses from commit messages and PR titles."
+    },
+    { "id": "Q6", "domain": "Boards", "type": "single",
+      "stem": "The recommended cadence for Scrum sprints is typically:",
+      "options": [
+        { "id": "A", "text": "1 day" },
+        { "id": "B", "text": "1-4 weeks" },
+        { "id": "C", "text": "3 months" },
+        { "id": "D", "text": "1 year" }
+      ],
+      "correct": ["B"],
+      "explanation": "Scrum sprints are 1-4 weeks; 2 weeks is most common."
+    },
+    { "id": "Q7", "domain": "Boards", "type": "truefalse",
+      "stem": "The Azure Boards process template (Basic, Agile, Scrum, CMMI) is selected at project creation and easily switched later.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["False"],
+      "explanation": "Selected at creation, but switching requires careful migration — work item types and fields differ."
+    },
+    { "id": "Q8", "domain": "Source control", "type": "single",
+      "stem": "Which branching strategy works best with continuous deployment, feature flags, and small batches?",
+      "options": [
+        { "id": "A", "text": "GitFlow" },
+        { "id": "B", "text": "Trunk-based development" },
+        { "id": "C", "text": "Centralized SVN-style" },
+        { "id": "D", "text": "Release Flow with weekly releases" }
+      ],
+      "correct": ["B"],
+      "explanation": "Trunk-based dev pairs naturally with CD: small frequent merges to main, features dark behind flags."
+    },
+    { "id": "Q9", "domain": "Source control", "type": "single",
+      "stem": "To prevent direct pushes to `main` in Azure Repos, configure:",
+      "options": [
+        { "id": "A", "text": "A Git hook on every dev's machine" },
+        { "id": "B", "text": "Branch policy with require pull request" },
+        { "id": "C", "text": "RBAC at the repository level" },
+        { "id": "D", "text": "Disable the main branch" }
+      ],
+      "correct": ["B"],
+      "explanation": "Branch policies enforce PR-driven changes server-side. Local hooks are bypassable."
+    },
+    { "id": "Q10", "domain": "Source control", "type": "multi",
+      "stem": "Which can be required by an Azure Repos branch policy? (Choose three.)",
+      "options": [
+        { "id": "A", "text": "Minimum number of reviewers" },
+        { "id": "B", "text": "Successful build validation" },
+        { "id": "C", "text": "Linked work items" },
+        { "id": "D", "text": "Commit message length" }
+      ],
+      "correct": ["A", "B", "C"],
+      "explanation": "A, B, C are built-in policies. Commit message length is not enforced as a branch policy in Azure Repos."
+    },
+    { "id": "Q11", "domain": "Source control", "type": "single",
+      "stem": "CODEOWNERS-style automatic reviewers by path in Azure Repos is configured in:",
+      "options": [
+        { "id": "A", "text": "A CODEOWNERS file in the repo" },
+        { "id": "B", "text": "The branch policies of the target branch" },
+        { "id": "C", "text": "azure-pipelines.yml" },
+        { "id": "D", "text": "Per-user notifications" }
+      ],
+      "correct": ["B"],
+      "explanation": "Azure Repos uses branch policies → Automatically include reviewers with path filters. GitHub uses CODEOWNERS file."
+    },
+    { "id": "Q12", "domain": "Source control", "type": "single",
+      "stem": "To avoid storing large binaries in Git history, use:",
+      "options": [
+        { "id": "A", "text": "Git submodules" },
+        { "id": "B", "text": "Git LFS" },
+        { "id": "C", "text": "Branch deletion" },
+        { "id": "D", "text": ".gitignore with rebase" }
+      ],
+      "correct": ["B"],
+      "explanation": "Git LFS keeps binary blobs in a separate store and points to them from Git."
+    },
+    { "id": "Q13", "domain": "Source control", "type": "single",
+      "stem": "In Azure Repos, branch policies are configured on the:",
+      "options": [
+        { "id": "A", "text": "Source branch" },
+        { "id": "B", "text": "Target branch" },
+        { "id": "C", "text": "Both, must match" },
+        { "id": "D", "text": "Repository root" }
+      ],
+      "correct": ["B"],
+      "explanation": "Policies live on the destination branch (the one being merged INTO)."
+    },
+    { "id": "Q14", "domain": "Source control", "type": "single",
+      "stem": "Which merge strategy keeps `main` history linear with one commit per PR?",
+      "options": [
+        { "id": "A", "text": "Merge commit" },
+        { "id": "B", "text": "Squash merge" },
+        { "id": "C", "text": "Rebase merge" },
+        { "id": "D", "text": "Cherry-pick" }
+      ],
+      "correct": ["B"],
+      "explanation": "Squash merge condenses the PR's commits into one. Rebase merge keeps each commit but linearizes them."
+    },
+    { "id": "Q15", "domain": "Pipelines", "type": "truefalse",
+      "stem": "In Azure Pipelines, PR triggers must be defined in the YAML of the target branch, not the source branch.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["True"],
+      "explanation": "Move the `pr:` config to `main` first; PR validations don't fire from feature-branch YAML."
+    },
+    { "id": "Q16", "domain": "Pipelines", "type": "single",
+      "stem": "Which YAML expression evaluates at compile time (when YAML is parsed)?",
+      "options": [
+        { "id": "A", "text": "$(var)" },
+        { "id": "B", "text": "${{ ... }}" },
+        { "id": "C", "text": "$[ ... ]" },
+        { "id": "D", "text": "%var%" }
+      ],
+      "correct": ["B"],
+      "explanation": "${{ }} is compile-time. $() is runtime variable substitution. $[ ] is a runtime expression."
+    },
+    { "id": "Q17", "domain": "Pipelines", "type": "single",
+      "stem": "To use a saved plan file across stages, you should:",
+      "options": [
+        { "id": "A", "text": "Save it as a pipeline variable" },
+        { "id": "B", "text": "Publish it as a pipeline artifact and download: in the next stage" },
+        { "id": "C", "text": "Email it to the next runner" },
+        { "id": "D", "text": "Re-run plan" }
+      ],
+      "correct": ["B"],
+      "explanation": "PublishPipelineArtifact@1 + download: current is the cross-stage handoff pattern."
+    },
+    { "id": "Q18", "domain": "Pipelines", "type": "single",
+      "stem": "Pipeline templates support all of the following template types EXCEPT:",
+      "options": [
+        { "id": "A", "text": "Step templates" },
+        { "id": "B", "text": "Job templates" },
+        { "id": "C", "text": "Stage templates" },
+        { "id": "D", "text": "Pool templates" }
+      ],
+      "correct": ["D"],
+      "explanation": "Step, job, stage, and variable templates exist. There is no pool template type."
+    },
+    { "id": "Q19", "domain": "Pipelines", "type": "single",
+      "stem": "To restrict an org to a pipeline template (e.g., for SAST scanning compliance), use:",
+      "options": [
+        { "id": "A", "text": "Required reviewers" },
+        { "id": "B", "text": "Pipeline policy → Required template" },
+        { "id": "C", "text": "Service connection permissions" },
+        { "id": "D", "text": "Branch policies" }
+      ],
+      "correct": ["B"],
+      "explanation": "Project settings → Pipelines → Required pipeline template enforces extends: from a specific template."
+    },
+    { "id": "Q20", "domain": "Agents", "type": "multi",
+      "stem": "Microsoft-hosted agents are best when: (Choose two.)",
+      "options": [
+        { "id": "A", "text": "You need access to a private VNet for build dependencies" },
+        { "id": "B", "text": "You don't want to maintain VMs" },
+        { "id": "C", "text": "You need clean, isolated builds with no leaked state" },
+        { "id": "D", "text": "You need GPUs" }
+      ],
+      "correct": ["B", "C"],
+      "explanation": "Microsoft-hosted = no maintenance, fresh-per-job. Private VNet access and GPUs typically need self-hosted."
+    },
+    { "id": "Q21", "domain": "Agents", "type": "single",
+      "stem": "The recommended modern approach for autoscaling self-hosted agents in Azure is:",
+      "options": [
+        { "id": "A", "text": "Manual VMs + cron scripts" },
+        { "id": "B", "text": "Azure DevOps Scale Set agents backed by Azure VMSS" },
+        { "id": "C", "text": "Functions" },
+        { "id": "D", "text": "Container Instances" }
+      ],
+      "correct": ["B"],
+      "explanation": "Scale Set agent pools automatically resize the underlying VMSS based on queued jobs."
+    },
+    { "id": "Q22", "domain": "Containers", "type": "single",
+      "stem": "Which Docker layer ordering maximizes cache hits in a Node.js Dockerfile?",
+      "options": [
+        { "id": "A", "text": "COPY all source first, then RUN npm ci" },
+        { "id": "B", "text": "COPY package*.json, RUN npm ci, then COPY remaining source" },
+        { "id": "C", "text": "RUN npm ci before any COPY" },
+        { "id": "D", "text": "Use only one big RUN" }
+      ],
+      "correct": ["B"],
+      "explanation": "Copying only the package files first lets npm ci's layer cache survive source changes."
+    },
+    { "id": "Q23", "domain": "Containers", "type": "single",
+      "stem": "Best practice for tagging an image built in CI is:",
+      "options": [
+        { "id": "A", "text": "Tag only :latest" },
+        { "id": "B", "text": "Tag with the commit SHA, plus optionally a semantic-version tag" },
+        { "id": "C", "text": "Tag with a random UUID" },
+        { "id": "D", "text": "Don't tag — let the registry assign" }
+      ],
+      "correct": ["B"],
+      "explanation": "Immutable tags (commit SHA) give traceability. :latest is fine as a secondary tag for dev, never for prod deploy."
+    },
+    { "id": "Q24", "domain": "Auth", "type": "single",
+      "stem": "Which is the modern, recommended way for an Azure DevOps pipeline to authenticate to Azure?",
+      "options": [
+        { "id": "A", "text": "Storing a Service Principal password as a secret variable" },
+        { "id": "B", "text": "Service connection with Workload Identity Federation (OIDC)" },
+        { "id": "C", "text": "Storing the user's AAD password in Key Vault" },
+        { "id": "D", "text": "Hardcoded subscription keys in YAML" }
+      ],
+      "correct": ["B"],
+      "explanation": "OIDC = no long-lived secret stored in Azure DevOps. Microsoft's recommendation for all new service connections."
+    },
+    { "id": "Q25", "domain": "Pipelines", "type": "single",
+      "stem": "Which Azure Pipelines feature lets you require human approval before a stage runs?",
+      "options": [
+        { "id": "A", "text": "Branch policies" },
+        { "id": "B", "text": "Environment + approval check" },
+        { "id": "C", "text": "Variable groups" },
+        { "id": "D", "text": "Build validation" }
+      ],
+      "correct": ["B"],
+      "explanation": "Define an environment in Pipelines → Environments → Approvals & checks. Deployment jobs target that environment."
+    },
+    { "id": "Q26", "domain": "Pipelines", "type": "single",
+      "stem": "To cache npm dependencies between pipeline runs, use:",
+      "options": [
+        { "id": "A", "text": "Cache@2 task with a key based on package-lock.json" },
+        { "id": "B", "text": "Pipeline variable persistence" },
+        { "id": "C", "text": "Service connection caching" },
+        { "id": "D", "text": "Az storage account upload/download" }
+      ],
+      "correct": ["A"],
+      "explanation": "Cache@2 with a key derived from the lockfile maximizes cache hit and invalidates on dep changes."
+    },
+    { "id": "Q27", "domain": "Pipelines", "type": "multi",
+      "stem": "Which are valid stages-level constructs in Azure Pipelines YAML? (Choose three.)",
+      "options": [
+        { "id": "A", "text": "dependsOn" },
+        { "id": "B", "text": "condition" },
+        { "id": "C", "text": "pool" },
+        { "id": "D", "text": "jobs" }
+      ],
+      "correct": ["A", "B", "D"],
+      "explanation": "pool is set on jobs, not stages. dependsOn, condition, and jobs are stage-level."
+    },
+    { "id": "Q28", "domain": "Containers", "type": "single",
+      "stem": "Which container registry tier is required for geo-replication and private endpoints in ACR?",
+      "options": [
+        { "id": "A", "text": "Basic" },
+        { "id": "B", "text": "Standard" },
+        { "id": "C", "text": "Premium" },
+        { "id": "D", "text": "All tiers support it" }
+      ],
+      "correct": ["C"],
+      "explanation": "Geo-replication, content trust, private endpoints, and repository-scoped tokens are Premium-only."
+    },
+    { "id": "Q29", "domain": "CD", "type": "single",
+      "stem": "Which deployment strategy keeps a complete second environment idle until a switch?",
+      "options": [
+        { "id": "A", "text": "Rolling" },
+        { "id": "B", "text": "Blue/Green" },
+        { "id": "C", "text": "Canary" },
+        { "id": "D", "text": "Recreate" }
+      ],
+      "correct": ["B"],
+      "explanation": "Blue/Green = two parallel environments. Switch traffic atomically; instant rollback."
+    },
+    { "id": "Q30", "domain": "CD", "type": "single",
+      "stem": "App Service deployment slot swap is essentially:",
+      "options": [
+        { "id": "A", "text": "A copy of binaries" },
+        { "id": "B", "text": "A metadata change that flips routing — near-instant" },
+        { "id": "C", "text": "A re-deploy of code" },
+        { "id": "D", "text": "A DNS update with 5-minute TTL" }
+      ],
+      "correct": ["B"],
+      "explanation": "The compute doesn't move; only the slot's identity flips. Hence the instant rollback by swapping back."
+    },
+    { "id": "Q31", "domain": "CD", "type": "single",
+      "stem": "Canary deployment refers to:",
+      "options": [
+        { "id": "A", "text": "Running tests in production" },
+        { "id": "B", "text": "Sending a small percentage of traffic to a new version, ramping up over time" },
+        { "id": "C", "text": "Deploying to one region only" },
+        { "id": "D", "text": "Reverting to last known good" }
+      ],
+      "correct": ["B"],
+      "explanation": "Canary = progressive traffic shift with monitoring; auto-rollback if metrics regress."
+    },
+    { "id": "Q32", "domain": "CD", "type": "multi",
+      "stem": "Which are valid Kubernetes deployment strategies? (Choose two.)",
+      "options": [
+        { "id": "A", "text": "Recreate" },
+        { "id": "B", "text": "RollingUpdate" },
+        { "id": "C", "text": "BlueGreenAuto" },
+        { "id": "D", "text": "RecreateRolling" }
+      ],
+      "correct": ["A", "B"],
+      "explanation": "Built-in: Recreate and RollingUpdate. For blue/green and canary in K8s you use Argo Rollouts or Flagger."
+    },
+    { "id": "Q33", "domain": "IaC", "type": "single",
+      "stem": "The Bicep equivalent of `terraform plan` is:",
+      "options": [
+        { "id": "A", "text": "az deployment group validate" },
+        { "id": "B", "text": "az deployment group what-if" },
+        { "id": "C", "text": "az bicep preview" },
+        { "id": "D", "text": "bicep test" }
+      ],
+      "correct": ["B"],
+      "explanation": "what-if shows the diff without applying. validate only checks syntactic/template validity."
+    },
+    { "id": "Q34", "domain": "IaC", "type": "single",
+      "stem": "Which deployment mode in ARM/Bicep DELETES resources in the resource group that aren't in the template?",
+      "options": [
+        { "id": "A", "text": "Incremental" },
+        { "id": "B", "text": "Complete" },
+        { "id": "C", "text": "Validate" },
+        { "id": "D", "text": "Drift" }
+      ],
+      "correct": ["B"],
+      "explanation": "Complete mode is destructive — use with care. Incremental (default) only adds/updates."
+    },
+    { "id": "Q35", "domain": "CD", "type": "single",
+      "stem": "To safely roll out a database schema change without breaking older app versions, use:",
+      "options": [
+        { "id": "A", "text": "Recreate strategy" },
+        { "id": "B", "text": "Expand/contract migrations (forward-compatible)" },
+        { "id": "C", "text": "Drop and recreate tables" },
+        { "id": "D", "text": "Apply schema before deploying app code" }
+      ],
+      "correct": ["B"],
+      "explanation": "Expand → migrate data → app uses new schema → contract. Allows mixed-version states during deploy/rollback."
+    },
+    { "id": "Q36", "domain": "Pipelines", "type": "single",
+      "stem": "Which Azure Pipelines feature stores reusable variables across pipelines?",
+      "options": [
+        { "id": "A", "text": "Pipeline-level variables" },
+        { "id": "B", "text": "Variable groups (Library)" },
+        { "id": "C", "text": "Environment variables" },
+        { "id": "D", "text": "Service connection secrets" }
+      ],
+      "correct": ["B"],
+      "explanation": "Library variable groups are shareable across pipelines and can be Key Vault-linked for secret hygiene."
+    },
+    { "id": "Q37", "domain": "Secrets", "type": "single",
+      "stem": "Which Azure DevOps integration is the recommended way to consume Azure Key Vault secrets in a pipeline?",
+      "options": [
+        { "id": "A", "text": "Hardcode in YAML" },
+        { "id": "B", "text": "Library variable group linked to a Key Vault" },
+        { "id": "C", "text": "SSH them in from a build agent" },
+        { "id": "D", "text": "ARM template parameters" }
+      ],
+      "correct": ["B"],
+      "explanation": "Linked variable groups pull secrets at job-run time. Rotation in KV is invisible to pipelines."
+    },
+    { "id": "Q38", "domain": "Security", "type": "single",
+      "stem": "Which scan type analyzes source code for vulnerabilities before runtime?",
+      "options": [
+        { "id": "A", "text": "SAST" },
+        { "id": "B", "text": "DAST" },
+        { "id": "C", "text": "SCA" },
+        { "id": "D", "text": "RASP" }
+      ],
+      "correct": ["A"],
+      "explanation": "SAST = Static Application Security Testing — reads code statically. DAST tests a running app. SCA inspects dependencies."
+    },
+    { "id": "Q39", "domain": "Security", "type": "single",
+      "stem": "Which scan type finds vulnerabilities in your open-source dependencies?",
+      "options": [
+        { "id": "A", "text": "SAST" },
+        { "id": "B", "text": "DAST" },
+        { "id": "C", "text": "SCA" },
+        { "id": "D", "text": "Penetration test" }
+      ],
+      "correct": ["C"],
+      "explanation": "SCA = Software Composition Analysis (Dependabot, Snyk, etc.)."
+    },
+    { "id": "Q40", "domain": "Auth", "type": "single",
+      "stem": "Why is OIDC federation preferred over a Service Principal secret?",
+      "options": [
+        { "id": "A", "text": "Faster authentication" },
+        { "id": "B", "text": "No long-lived secret to rotate or leak" },
+        { "id": "C", "text": "Cheaper" },
+        { "id": "D", "text": "Works without Entra ID" }
+      ],
+      "correct": ["B"],
+      "explanation": "OIDC issues short-lived tokens via federated trust. Nothing sensitive stored."
+    },
+    { "id": "Q41", "domain": "Secrets", "type": "multi",
+      "stem": "Which are valid effects on a pipeline `secret` variable? (Choose two.)",
+      "options": [
+        { "id": "A", "text": "Masked in logs" },
+        { "id": "B", "text": "Not auto-exposed as environment variables to scripts" },
+        { "id": "C", "text": "Encrypted in source YAML" },
+        { "id": "D", "text": "Stored in plain text in the database" }
+      ],
+      "correct": ["A", "B"],
+      "explanation": "Secrets are masked + require explicit env: mapping in scripts. They're encrypted at rest."
+    },
+    { "id": "Q42", "domain": "Security", "type": "multi",
+      "stem": "GHAS for Azure DevOps provides which capabilities? (Choose three.)",
+      "options": [
+        { "id": "A", "text": "Secret scanning" },
+        { "id": "B", "text": "Code scanning (CodeQL)" },
+        { "id": "C", "text": "Dependency scanning" },
+        { "id": "D", "text": "Performance profiling" }
+      ],
+      "correct": ["A", "B", "C"],
+      "explanation": "GHAS = secret + code + dependency scanning. Performance profiling is unrelated."
+    },
+    { "id": "Q43", "domain": "Security", "type": "truefalse",
+      "stem": "Tools like gitleaks catch ALL secrets in your repo.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["False"],
+      "explanation": "Scanners catch patterns. Random long tokens without a known pattern may slip through. Defense in depth required."
+    },
+    { "id": "Q44", "domain": "Security", "type": "single",
+      "stem": "To produce a Software Bill of Materials for a container image, use:",
+      "options": [
+        { "id": "A", "text": "syft or similar" },
+        { "id": "B", "text": "terraform sbom" },
+        { "id": "C", "text": "az image sbom" },
+        { "id": "D", "text": "kubectl bill" }
+      ],
+      "correct": ["A"],
+      "explanation": "Syft / Trivy / cdxgen generate SBOMs in CycloneDX or SPDX format."
+    },
+    { "id": "Q45", "domain": "Observability", "type": "single",
+      "stem": "The three pillars of observability are:",
+      "options": [
+        { "id": "A", "text": "Metrics, logs, traces" },
+        { "id": "B", "text": "CPU, memory, network" },
+        { "id": "C", "text": "Alerts, dashboards, runbooks" },
+        { "id": "D", "text": "Build, deploy, release" }
+      ],
+      "correct": ["A"],
+      "explanation": "Metrics (numeric time series), logs (events), traces (request path across services)."
+    },
+    { "id": "Q46", "domain": "Observability", "type": "multi",
+      "stem": "Application Insights auto-instruments which languages without code changes? (Choose three.)",
+      "options": [
+        { "id": "A", "text": ".NET" },
+        { "id": "B", "text": "Java" },
+        { "id": "C", "text": "Node.js" },
+        { "id": "D", "text": "Assembly" }
+      ],
+      "correct": ["A", "B", "C"],
+      "explanation": "Codeless auto-instrumentation is available for .NET, Java, Node, Python on App Service. Assembly does not."
+    },
+    { "id": "Q47", "domain": "Observability", "type": "single",
+      "stem": "Which task adds a release annotation to App Insights from a pipeline?",
+      "options": [
+        { "id": "A", "text": "ApplicationInsightsAnnotation@1" },
+        { "id": "B", "text": "AppInsightsLog@1" },
+        { "id": "C", "text": "MonitorAlert@1" },
+        { "id": "D", "text": "AzureMonitor@1" }
+      ],
+      "correct": ["A"],
+      "explanation": "ApplicationInsightsAnnotation@1 marks the deploy timestamp on App Insights charts."
+    },
+    { "id": "Q48", "domain": "Observability", "type": "truefalse",
+      "stem": "Workspace-based Application Insights stores its data in a Log Analytics workspace, not a separate datastore.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["True"],
+      "explanation": "Workspace-based AppI writes to a LAW, unifying queries across the two."
+    },
+    { "id": "Q49", "domain": "Observability", "type": "single",
+      "stem": "To correlate logs across services in a distributed request, the most important thing to include in every log line is:",
+      "options": [
+        { "id": "A", "text": "Local timestamp" },
+        { "id": "B", "text": "The trace_id / correlation_id" },
+        { "id": "C", "text": "The pod name" },
+        { "id": "D", "text": "The exception message" }
+      ],
+      "correct": ["B"],
+      "explanation": "Without a shared trace ID, joining logs across services becomes manual archaeology."
+    },
+    { "id": "Q50", "domain": "SRE", "type": "single",
+      "stem": "The difference between SLA, SLO, and SLI:",
+      "options": [
+        { "id": "A", "text": "They're synonyms" },
+        { "id": "B", "text": "SLI is the measurement, SLO is the internal target, SLA is the external promise" },
+        { "id": "C", "text": "SLA is the measurement, SLO is the average, SLI is the dashboard" },
+        { "id": "D", "text": "SLA is daily, SLO is monthly, SLI is yearly" }
+      ],
+      "correct": ["B"],
+      "explanation": "SLI → measured indicator. SLO → internal target. SLA → contractual promise (usually looser than SLO)."
+    },
+    { "id": "Q51", "domain": "SRE", "type": "single",
+      "stem": "If your SLO is 99.9%, your monthly error budget is approximately:",
+      "options": [
+        { "id": "A", "text": "1 second" },
+        { "id": "B", "text": "43 minutes" },
+        { "id": "C", "text": "4 hours 22 minutes" },
+        { "id": "D", "text": "7 hours" }
+      ],
+      "correct": ["B"],
+      "explanation": "0.1% of ~30 days ≈ 43.2 minutes per month."
+    },
+    { "id": "Q52", "domain": "SRE", "type": "single",
+      "stem": "What's the SRE response to consistently meeting 100% uptime when your SLO is 99.9%?",
+      "options": [
+        { "id": "A", "text": "Celebrate and continue" },
+        { "id": "B", "text": "Tighten the SLO to 99.99%" },
+        { "id": "C", "text": "Take more risks — ship features faster" },
+        { "id": "D", "text": "Reduce monitoring" }
+      ],
+      "correct": ["C"],
+      "explanation": "Unused error budget = headroom for risk. Ship faster (or introduce chaos engineering) to use the budget productively."
+    },
+    { "id": "Q53", "domain": "SRE", "type": "multi",
+      "stem": "Good characteristics of an SRE alert: (Choose three.)",
+      "options": [
+        { "id": "A", "text": "Actionable" },
+        { "id": "B", "text": "Page only what's worth waking someone for" },
+        { "id": "C", "text": "Includes a runbook link" },
+        { "id": "D", "text": "Fires on every blip" }
+      ],
+      "correct": ["A", "B", "C"],
+      "explanation": "Alerting on every blip causes alert fatigue and lowers signal-to-noise."
+    },
+    { "id": "Q54", "domain": "SRE", "type": "truefalse",
+      "stem": "A blameless postmortem assigns responsibility to the engineer who pushed the bad change.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["False"],
+      "explanation": "Blameless means systems are responsible. X pushed the button, but the system let them — fix the system."
+    },
+    { "id": "Q55", "domain": "GitHub Actions", "type": "single",
+      "stem": "The GitHub Actions equivalent of task: AzureCLI@2 is:",
+      "options": [
+        { "id": "A", "text": "uses: azure/login@v2 + run: az ..." },
+        { "id": "B", "text": "task: AzureCLI@2 (same)" },
+        { "id": "C", "text": "gh az" },
+        { "id": "D", "text": "script: az ..." }
+      ],
+      "correct": ["A"],
+      "explanation": "Auth happens once via azure/login@v2; subsequent run: steps call az against the authenticated session."
+    },
+    { "id": "Q56", "domain": "GitHub Actions", "type": "single",
+      "stem": "For OIDC from GitHub Actions to Azure, the workflow must include:",
+      "options": [
+        { "id": "A", "text": "permissions: { id-token: write }" },
+        { "id": "B", "text": "A long-lived secret" },
+        { "id": "C", "text": "runs-on: self-hosted" },
+        { "id": "D", "text": "Nothing extra" }
+      ],
+      "correct": ["A"],
+      "explanation": "Without that permission, GitHub Actions cannot mint the OIDC token. Without that token, the federated trust handshake fails."
+    },
+    { "id": "Q57", "domain": "GitHub Actions", "type": "single",
+      "stem": "Reusable workflows in GitHub Actions are invoked with:",
+      "options": [
+        { "id": "A", "text": "uses: owner/repo/.github/workflows/x.yml@ref" },
+        { "id": "B", "text": "template: x.yml" },
+        { "id": "C", "text": "extends: x.yml" },
+        { "id": "D", "text": "import x.yml" }
+      ],
+      "correct": ["A"],
+      "explanation": "workflow_call reusable workflows are called with uses: owner/repo/.github/workflows/file.yml@ref."
+    },
+    { "id": "Q58", "domain": "Feature flags", "type": "single",
+      "stem": "Feature flags are MOST useful for:",
+      "options": [
+        { "id": "A", "text": "Reducing image size" },
+        { "id": "B", "text": "Decoupling deployment from release" },
+        { "id": "C", "text": "Compiling code faster" },
+        { "id": "D", "text": "Replacing version control" }
+      ],
+      "correct": ["B"],
+      "explanation": "Flags let you deploy code dark, then enable for some/all users without redeploying."
+    },
+    { "id": "Q59", "domain": "Feature flags", "type": "multi",
+      "stem": "Valid filter types in Azure App Configuration feature management: (Choose two.)",
+      "options": [
+        { "id": "A", "text": "Microsoft.Percentage" },
+        { "id": "B", "text": "Microsoft.TimeWindow" },
+        { "id": "C", "text": "Microsoft.RandomUser" },
+        { "id": "D", "text": "Microsoft.CommitSha" }
+      ],
+      "correct": ["A", "B"],
+      "explanation": "Built-in filters: Percentage, TimeWindow, Targeting (groups/users)."
+    },
+    { "id": "Q60", "domain": "Feature flags", "type": "truefalse",
+      "stem": "Old feature flags should be left in place forever in case rollback is needed.",
+      "options": [
+        { "id": "True", "text": "True" },
+        { "id": "False", "text": "False" }
+      ],
+      "correct": ["False"],
+      "explanation": "Stale flags = dead code branches. Delete release/experiment flags after they're 100% rolled out and stable for 2+ weeks."
+    }
+  ]
+}

@@ -95,6 +95,7 @@ The Azure DevOps Engineer Expert exam. Heavy on CI/CD (50-55% combined). Scenari
 
 ## Practice resources
 
+- 🎯 **This repo's [60-question sample exam](../sample_exam/exam.md)** — start here
 - Official Microsoft Learn path: https://learn.microsoft.com/training/courses/az-400t00
 - Microsoft Practice Assessment (free): https://learn.microsoft.com/credentials/certifications/devops-engineer/practice/assessment
 - MeasureUp practice tests (paid).
