@@ -1,0 +1,46 @@
+Work Item Type,Title,Description,State,Priority,Tags,Area Path,Iteration Path,Parent
+Epic,E-commerce Platform,Main product platform for online shopping,New,1,epic,DemoProject,DemoProject\Sprint 1,
+Epic,CI/CD Automation Platform,DevOps pipeline and automation system,New,1,epic,DemoProject,DemoProject\Sprint 1,
+
+Feature,User Authentication System,Login/signup and identity management,New,1,frontend;backend,DemoProject\Backend,DemoProject\Sprint 1,E-commerce Platform
+Feature,Product Catalog Management,Manage products, categories, and search,New,1,frontend;backend,DemoProject\Frontend,DemoProject\Sprint 1,E-commerce Platform
+Feature,Shopping Cart & Checkout,Cart, payment flow, and order placement,New,1,frontend;backend,DemoProject\Frontend,DemoProject\Sprint 1,E-commerce Platform
+Feature,CI/CD Pipeline Setup,Automated build and deployment pipeline,New,1,devops,DemoProject\DevOps,DemoProject\Sprint 1,CI/CD Automation Platform
+Feature,QA Automation Framework,Automated testing framework setup,New,1,qa;automation,DemoProject\QA,DemoProject\Sprint 1,CI/CD Automation Platform
+
+User Story,User can register an account,As a user I want to register so that I can access the system,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,User Authentication System
+User Story,User can login securely,As a user I want to login so that I can access my account,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,User Authentication System
+User Story,Password reset functionality,As a user I want to reset my password if forgotten,New,2,frontend,DemoProject\Frontend,DemoProject\Sprint 1,User Authentication System
+
+User Story,Browse product catalog,As a user I want to browse products so I can shop,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Product Catalog Management
+User Story,Search products,As a user I want to search products quickly,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Product Catalog Management
+User Story,Filter products by category,As a user I want to filter products,New,2,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Product Catalog Management
+
+User Story,Add items to cart,As a user I want to add items to cart,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Shopping Cart & Checkout
+User Story,Checkout and payment,As a user I want to complete purchase,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Shopping Cart & Checkout
+User Story,Order confirmation page,As a user I want confirmation after purchase,New,2,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Shopping Cart & Checkout
+
+User Story,Setup build pipeline,As a DevOps engineer I want CI pipeline,New,1,devops,DemoProject\DevOps,DemoProject\Sprint 1,CI/CD Pipeline Setup
+User Story,Setup release pipeline,As a DevOps engineer I want CD pipeline,New,1,devops,DemoProject\DevOps,DemoProject\Sprint 1,CI/CD Pipeline Setup
+User Story,Infrastructure as Code setup,As a DevOps engineer I want IaC automation,New,1,devops,DemoProject\DevOps,DemoProject\Sprint 1,CI/CD Pipeline Setup
+
+User Story,Create test plan,As a QA engineer I want test plan,New,1,qa,DemoProject\QA,DemoProject\Sprint 1,QA Automation Framework
+User Story,Automate regression tests,As a QA engineer I want automated tests,New,1,qa;automation,DemoProject\QA,DemoProject\Sprint 1,QA Automation Framework
+User Story,API testing suite,As a QA engineer I want API tests,New,2,qa,DemoProject\QA,DemoProject\Sprint 1,QA Automation Framework
+
+Task,Design login UI,Create UI mockups for login page,New,2,frontend,DemoProject\Frontend,DemoProject\Sprint 1,User can register an account
+Task,Implement login API,Build authentication API endpoints,New,1,backend,DemoProject\Backend,DemoProject\Sprint 1,User can login securely
+Task,Write unit tests for auth,Add unit tests for authentication module,New,2,qa,DemoProject\QA,DemoProject\Sprint 1,User can login securely
+
+Task,Build product listing UI,Create product grid UI,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Browse product catalog
+Task,Implement search API,Backend search service,New,1,backend,DemoProject\Backend,DemoProject\Sprint 1,Search products
+Task,Optimize database queries,Improve product query performance,New,2,backend,DemoProject\Backend,DemoProject\Sprint 1,Search products
+
+Task,Build cart UI,Shopping cart frontend,New,1,frontend,DemoProject\Frontend,DemoProject\Sprint 1,Add items to cart
+Task,Implement payment gateway,Integrate payment provider API,New,1,backend,DemoProject\Backend,DemoProject\Sprint 1,Checkout and payment
+
+Task,Configure Azure Pipeline,Create YAML pipeline,New,1,devops,DemoProject\DevOps,DemoProject\Sprint 1,Setup build pipeline
+Task,Setup deployment slots,Configure staging/production slots,New,2,devops,DemoProject\DevOps,DemoProject\Sprint 1,Setup release pipeline
+
+Task,Write test cases,Create manual test cases,New,1,qa,DemoProject\QA,DemoProject\Sprint 1,Create test plan
+Task,Automate login tests,Create Selenium/Playwright tests,New,1,qa;automation,DemoProject\QA,DemoProject\Sprint 1,Automate regression tests
